@@ -6,10 +6,14 @@ const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
+
+// IMPORTANT for Render
+app.set('trust proxy', 1);
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -18,22 +22,31 @@ app.use(express.json());
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'dev-secret',
-
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { secure: false } // Render handles HTTPS
 }));
 
+// ================= AUTH CHECK =================
+
 const isAuth = (req, res, next) => {
-    if (!req.session.userId) return res.redirect('/');
+    if (!req.session.userId) return res.redirect('/login');
     next();
 };
 
+// ================= ROOT =================
 
+app.get('/', (req, res) => {
+    if (req.session.userId) {
+        return res.redirect('/dashboard');
+    }
+    res.redirect('/login');
+});
 
-// ================= AUTH =================
-
-app.get('/', (req, res) => res.render('login'));
+app.get('/login', (req, res) => res.render('login'));
 app.get('/register', (req, res) => res.render('register'));
+
+// ================= REGISTER =================
 
 app.post('/register', async (req, res) => {
     try {
@@ -45,12 +58,14 @@ app.post('/register', async (req, res) => {
             [id_number, name, hashed]
         );
 
-        res.redirect('/');
+        res.redirect('/login');
     } catch (err) {
         console.error(err);
         res.status(500).send("Registration Error");
     }
 });
+
+// ================= LOGIN =================
 
 app.post('/login', async (req, res) => {
     try {
@@ -76,8 +91,6 @@ app.post('/login', async (req, res) => {
         res.status(500).send("Login Error");
     }
 });
-
-
 
 // ================= DASHBOARD =================
 
@@ -112,8 +125,6 @@ app.post('/delete-agent', isAuth, async (req, res) => {
     res.redirect('/dashboard');
 });
 
-
-
 // ================= AGENT PAGE =================
 
 app.get('/agent/:id', isAuth, async (req, res) => {
@@ -137,8 +148,6 @@ app.get('/agent/:id', isAuth, async (req, res) => {
     });
 });
 
-
-
 // ================= SAVE PROMPT =================
 
 app.post('/save-prompt', isAuth, async (req, res) => {
@@ -159,8 +168,6 @@ app.post('/save-prompt', isAuth, async (req, res) => {
 
     res.redirect(`/agent/${agentId}`);
 });
-
-
 
 // ================= UPDATE PROMPT =================
 
@@ -189,8 +196,6 @@ app.post('/update-prompt', isAuth, async (req, res) => {
     res.redirect(`/agent/${agentId}`);
 });
 
-
-
 // ================= DELETE PROMPT =================
 
 app.post('/delete-prompt', isAuth, async (req, res) => {
@@ -216,8 +221,8 @@ app.post('/delete-prompt', isAuth, async (req, res) => {
     res.redirect(`/agent/${agentId}`);
 });
 
-
+// ================= START SERVER =================
 
 app.listen(PORT, () => {
-    console.log(`Server Running → http://localhost:${PORT}`);
+    console.log(`Server Running on port ${PORT}`);
 });
