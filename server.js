@@ -5,8 +5,7 @@ const bcrypt = require('bcryptjs');
 const { Pool } = require('pg');
 
 const app = express();
-const PORT = 5000;
-
+const PORT = process.env.PORT || 5000;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
