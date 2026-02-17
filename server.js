@@ -226,3 +226,14 @@ app.post('/delete-prompt', isAuth, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server Running on port ${PORT}`);
 });
+// ================= LOGOUT =================
+
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.redirect('/dashboard');
+        }
+        res.clearCookie('connect.sid'); // important
+        res.redirect('/');
+    });
+});
