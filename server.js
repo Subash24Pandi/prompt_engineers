@@ -17,7 +17,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'aitel-secret-key',
+    secret: process.env.SESSION_SECRET || 'dev-secret',
+
     resave: false,
     saveUninitialized: false
 }));
