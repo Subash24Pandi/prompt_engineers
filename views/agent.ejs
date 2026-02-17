@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #05070a; color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .editor-box { background: #0c0e12; border: 1px solid rgba(255,255,255,0.05); }
+        .p-btn { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); transition: 0.3s; }
+        .modal-active { display: flex !important; }
+    </style>
+    <title>The AItel | Editor</title>
+</head>
+<body class="py-10 px-6">
+    <div class="max-w-4xl mx-auto relative">
+        <div class="absolute -top-4 -left-4">
+            <img src="/logo.png" class="w-20 h-20 object-contain" onerror="this.src='https://via.placeholder.com/80?text=LOGO'">
+        </div>
+        
+        <nav class="flex justify-end items-center mb-10 pt-4">
+            <a href="/dashboard" class="p-btn text-white px-6 py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest">← BACK</a>
+        </nav>
+
+        <section class="editor-box rounded-3xl p-8 mb-10 shadow-xl">
+            <form action="/save-prompt" method="POST" class="space-y-4">
+                <input type="hidden" name="agentId" value="<%= agentId %>">
+                <input name="title" placeholder="IDENTIFIER NAME" class="w-full bg-transparent border-b border-white/10 py-2 text-xl font-bold focus:border-blue-500 outline-none uppercase tracking-tighter" required>
+                <textarea name="content" placeholder="ENTER SYSTEM INSTRUCTIONS..." class="w-full h-40 bg-white/5 p-6 rounded-2xl font-mono text-sm text-blue-100 outline-none border border-white/5" required></textarea>
+                <div class="flex justify-end"><button class="p-btn px-8 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest">DEPLOY</button></div>
+            </form>
+        </section>
+
+        <div class="space-y-6">
+            <% prompts.forEach(p => { %>
+                <div class="editor-box rounded-3xl p-8">
+                   <div class="flex justify-between items-center mb-4">
+    <h3 class="font-bold text-xs tracking-widest opacity-80 uppercase tracking-tighter"><%= p.title %></h3>
+    <div class="flex gap-4">
+    <button onclick="openEditModal('<%= p.id %>', `<%= p.content %>`)" class="text-blue-500 text-[10px] font-bold uppercase hover:underline">EDIT</button>
+    
+    <form action="/delete-prompt" method="POST" onsubmit="return confirm('Purge this record from system?');">
+        <input type="hidden" name="promptId" value="<%= p.id %>">
+        <button type="submit" class="text-red-500 text-[10px] font-bold uppercase hover:underline">DELETE</button>
+    </form>
+</div>
+</div>                    <div class="bg-black/40 p-5 rounded-xl font-mono text-xs text-gray-400 italic">"<%= p.content %>"</div>
+                    
+                    <% if(p.last_edit_reason) { %>
+                        <div class="mt-4 pt-3 border-t border-white/5 flex justify-between items-center text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                            <span>Audit: <span class="font-normal normal-case italic ml-2">"<%= p.last_edit_reason %>"</span></span>
+                            <span><%= new Date(p.last_edit_date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) %></span>
+                        </div>
+                    <% } %>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <div id="modalOverlay" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl z-[100] items-center justify-center p-6">
+        <div class="w-full max-w-xl bg-[#0c0e12] border border-white/10 p-8 rounded-3xl shadow-2xl">
+            <h2 class="text-lg font-bold mb-6 uppercase text-white tracking-widest">Secure Modification</h2>
+            <form action="/update-prompt" method="POST" class="space-y-4">
+                <input type="hidden" name="promptId" id="modalPromptId">
+                <input type="hidden" name="agentId" value="<%= agentId %>">
+                <textarea name="content" id="modalContent" class="w-full h-48 bg-white/5 p-4 rounded-xl font-mono text-sm text-blue-100 outline-none border border-white/5" required></textarea>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">Comment Box (Mandatory Reason) *</label>
+                    <input type="text" name="reason" placeholder="State justification..." class="w-full bg-transparent border-b border-white/10 p-2 text-sm text-white outline-none focus:border-blue-500" required>
+                </div>
+                <div class="flex justify-end gap-6 pt-4 items-center">
+                    <button type="button" onclick="closeEditModal()" class="text-[10px] font-bold text-gray-500 uppercase">Abort</button>
+                    <button class="p-btn text-white px-8 py-2 rounded-xl font-bold text-[10px] uppercase">Commit Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal(id, content) {
+            document.getElementById('modalOverlay').classList.add('modal-active');
+            document.getElementById('modalPromptId').value = id;
+            document.getElementById('modalContent').value = content;
+        }
+        function closeEditModal() {
+            document.getElementById('modalOverlay').classList.remove('modal-active');
+        }
+    </script>
+</body>
+</html>
