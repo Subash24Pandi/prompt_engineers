@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prompt Engineers Portal</title>
+    <link rel="stylesheet" href="/public/styles.css">
+</head>
+<body>
+    <div class="home-container">
+        <h2>Welcome to Prompt Engineers Portal</h2>
+        <div class="login-options">
+            <a href="/login" class="btn">Prompt Engineer Login</a>
+            <% if (showAdminLogin) { %>
+                <a href="/admin/login" class="btn">Admin Login</a>
+            <% } %>
+        </div>
+        <div class="register-link">
+            <a href="/register">Register as Prompt Engineer</a>
+        </div>
+    </div>
+</body>
+</html>
