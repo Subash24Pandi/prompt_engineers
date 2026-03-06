@@ -39,7 +39,10 @@ const isAuth = (req, res, next) => {
 // ================= ROOT =================
 
 app.get('/', (req, res) => {
-    res.render('home');
+    if (req.session.userId) {
+        return res.redirect('/dashboard');
+    }
+    res.render('home', { showAdminLogin: true });
 });
 
 app.get('/login', (req, res) => res.render('login'));

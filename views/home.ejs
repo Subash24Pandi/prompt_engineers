@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -21,6 +22,24 @@
             <a href="/login" class="premium-btn w-full text-white py-4 rounded-2xl font-bold text-base tracking-widest uppercase">Login as Engineer</a>
             <a href="/admin-login" class="premium-btn w-full text-white py-4 rounded-2xl font-bold text-base tracking-widest uppercase">Login as Admin</a>
             <a href="/register" class="premium-btn w-full text-white py-4 rounded-2xl font-bold text-base tracking-widest uppercase">Register Engineer</a>
+=======
+<html>
+<head>
+    <title>Prompt Engineers Portal</title>
+    <link rel="stylesheet" href="/public/styles.css">
+</head>
+<body>
+    <div class="home-container">
+        <h2>Welcome to Prompt Engineers Portal</h2>
+        <div class="login-options">
+            <a href="/login" class="btn">Prompt Engineer Login</a>
+            <% if (showAdminLogin) { %>
+                <a href="/admin/login" class="btn">Admin Login</a>
+            <% } %>
+        </div>
+        <div class="register-link">
+            <a href="/register">Register as Prompt Engineer</a>
+>>>>>>> 062c5af476d7e50143a5c640bfee3dfcd0514eea
         </div>
     </div>
 </body>

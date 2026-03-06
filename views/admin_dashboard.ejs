@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -52,6 +53,65 @@
                 <button class="premium-btn w-full text-white py-3 rounded-xl font-bold text-xs tracking-widest uppercase">CREATE ADMIN</button>
             </form>
         </div>
+=======
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/public/styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h2>Admin Dashboard</h2>
+        <h3>Prompt Engineers</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Prompts</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% engineers.forEach(function(engineer) { %>
+                    <tr>
+                        <td><%= engineer.id %></td>
+                        <td><%= engineer.name %></td>
+                        <td>
+                            <ul>
+                                <% engineer.prompts.forEach(function(prompt) { %>
+                                    <li>
+                                        <strong><%= prompt.title %></strong>: <%= prompt.content %>
+                                        <form action="/admin/edit-prompt" method="POST" style="display:inline;">
+                                            <input type="hidden" name="promptId" value="<%= prompt.id %>">
+                                            <button type="submit">Edit</button>
+                                        </form>
+                                        <form action="/admin/delete-prompt" method="POST" style="display:inline;">
+                                            <input type="hidden" name="promptId" value="<%= prompt.id %>">
+                                            <button type="submit">Delete</button>
+                                        </form>
+                                    </li>
+                                <% }) %>
+                            </ul>
+                        </td>
+                        <td>
+                            <form action="/admin/remove-engineer" method="POST" style="display:inline;">
+                                <input type="hidden" name="engineerId" value="<%= engineer.id %>">
+                                <button type="submit">Remove Engineer</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+        <h3>Admin Management</h3>
+        <form action="/admin/create-admin" method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="text" name="name" placeholder="Name">
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Create Admin</button>
+        </form>
+>>>>>>> 062c5af476d7e50143a5c640bfee3dfcd0514eea
     </div>
 </body>
 </html>
