@@ -1,3 +1,39 @@
+    <!-- Edit Prompt Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md text-black relative">
+            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-xl font-bold">×</button>
+            <form id="editPromptForm" method="POST">
+                <input type="hidden" name="agentId" id="editAgentId">
+                <input type="hidden" name="engineerId" id="editEngineerId">
+                <div class="mb-4">
+                    <label class="block font-bold mb-2">Prompt</label>
+                    <textarea name="content" id="editPromptContent" rows="4" class="w-full border rounded p-2" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block font-bold mb-2">Reason for Edit</label>
+                    <input name="reason" id="editPromptReason" class="w-full border rounded p-2" required>
+                </div>
+                <button class="premium-btn text-white px-6 py-2 rounded-lg font-bold">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal(agentId, engineerId) {
+            // Fetch current prompt content via AJAX
+            fetch(`/api/agent/${agentId}/prompt`).then(res => res.json()).then(data => {
+                document.getElementById('editPromptContent').value = data.content || '';
+            });
+            document.getElementById('editAgentId').value = agentId;
+            document.getElementById('editEngineerId').value = engineerId;
+            document.getElementById('editPromptReason').value = '';
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editPromptForm').action = `/admin/edit-prompt`;
+        }
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+    </script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +59,30 @@
     </header>
 
     <main class="max-w-6xl mx-auto px-6 py-6">
+        <% if (admin) { %>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <% engineers.forEach(engineer => { %>
+                <div class="glass-panel p-8 rounded-[2rem]">
+                    <h2 class="text-2xl font-bold mb-4 uppercase"><%= engineer.name %></h2>
+                    <div class="grid grid-cols-1 gap-4">
+                        <% engineer.agents.forEach(agent => { %>
+                            <div class="glass-panel p-4 rounded-xl mb-2">
+                                <h3 class="text-lg font-semibold mb-2"><%= agent.agent_name %></h3>
+                                <div class="flex gap-2">
+                                    <a href="/admin/view-prompt/<%= agent.id %>" class="premium-btn px-3 py-1 rounded text-xs font-bold">View</a>
+                                    <button onclick="openEditModal('<%= agent.id %>','<%= engineer.id %>')" class="bg-yellow-500 px-3 py-1 rounded text-xs font-bold">Edit</button>
+                                    <form action="/admin/delete-prompt" method="POST" style="display:inline">
+                                        <input type="hidden" name="agentId" value="<%= agent.id %>">
+                                        <button class="bg-red-500 px-3 py-1 rounded text-xs font-bold">Delete Prompt</button>
+                                    </form>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+        <% } else { %>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <% agents.forEach(agent => { %>
                 <div class="glass-panel p-8 rounded-[2rem] group relative hover:border-blue-500/50 transition-all duration-300">
@@ -30,7 +90,6 @@
                         <input type="hidden" name="agentId" value="<%= agent.id %>">
                         <button class="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold uppercase tracking-widest hover:underline">Delete Agent</button>
                     </form>
-
                     <a href="/agent/<%= agent.id %>" class="block">
                         <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-all">
                             <svg class="w-6 h-6 text-blue-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -43,10 +102,11 @@
                 </div>
             <% }) %>
         </div>
+        <% } %>
         <a href="/logout"
    class="fixed bottom-4 right-4 premium-btn text-white px-6 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase shadow-lg">
    Logout
 </a>
-</main>
+    </main>
 </body>
 </html>

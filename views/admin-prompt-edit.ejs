@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Edit Prompt | Admin Portal</title>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <header class="flex flex-col items-center justify-center p-6 max-w-6xl mx-auto">
+        <img src="/logo.png" alt="Aitel Logo" class="w-24 mb-4">
+        <h1 class="text-2xl font-bold mb-2">Edit Prompt: <%= prompt.title %></h1>
+        <a href="/admin-dashboard/engineer/<%= engineer.id %>/agent/<%= agent.id %>" class="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold mt-2">Back</a>
+    </header>
+    <main class="max-w-6xl mx-auto px-6 py-6">
+        <form id="editPromptForm" action="/admin-dashboard/engineer/<%= engineer.id %>/agent/<%= agent.id %>/prompt/<%= prompt.id %>/edit" method="POST" class="bg-gray-800 rounded-2xl p-8 w-full max-w-5xl h-[90vh] flex flex-col items-center shadow-lg gap-4 mx-auto">
+            <img src="/logo.png" alt="Aitel Logo" class="w-12 mb-4">
+            <div class="w-full h-[75vh]">
+                <label class="block font-bold mb-2">Prompt Content</label>
+                <textarea name="content" rows="30" class="w-full h-full border rounded p-2 text-black resize-none" required><%= prompt.content %></textarea>
+            </div>
+            <button type="button" onclick="showReasonModal()" class="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold">Save Changes</button>
+        </form>
+
+        <!-- Reason Modal -->
+        <div id="reasonModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 hidden z-50">
+            <div class="bg-gray-800 rounded-2xl p-8 w-full max-w-md flex flex-col items-center shadow-lg gap-4">
+                <h2 class="text-xl font-bold mb-4">Enter Reason for Edit</h2>
+                <input id="reasonInput" name="reason" class="w-full border rounded p-2 text-black mb-4" required>
+                <div class="flex gap-4">
+                    <button onclick="submitEditForm()" class="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold">Submit</button>
+                    <button onclick="hideReasonModal()" class="bg-gray-500 text-white px-6 py-2 rounded-lg font-bold">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function showReasonModal() {
+                document.getElementById('reasonModal').style.display = 'flex';
+            }
+            function hideReasonModal() {
+                document.getElementById('reasonModal').style.display = 'none';
+            }
+            function submitEditForm() {
+                const reason = document.getElementById('reasonInput').value;
+                if (!reason.trim()) {
+                    alert('Please enter a reason for edit.');
+                    return;
+                }
+                // Add reason to form
+                const form = document.getElementById('editPromptForm');
+                let reasonField = form.querySelector('input[name="reason"]');
+                if (!reasonField) {
+                    reasonField = document.createElement('input');
+                    reasonField.type = 'hidden';
+                    reasonField.name = 'reason';
+                    form.appendChild(reasonField);
+                }
+                reasonField.value = reason;
+                form.submit();
+            }
+        </script>
+    </main>
+</body>
+</html>

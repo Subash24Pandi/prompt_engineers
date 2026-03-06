@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Create Admin | Prompt Engineers Portal</title>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+    <div class="bg-gray-800 rounded-xl p-8 w-full max-w-md shadow-lg flex flex-col items-center">
+        <img src="/logo.png" alt="Aitel Logo" class="w-24 mb-6">
+        <h1 class="text-2xl font-bold mb-8">CREATE ADMIN</h1>
+        <form action="/create-admin" method="POST" class="w-full flex flex-col gap-4">
+            <input name="username" placeholder="Admin Username" class="bg-gray-700 border-none px-4 py-2 rounded text-white" required>
+            <input name="password" type="password" placeholder="Password" class="bg-gray-700 border-none px-4 py-2 rounded text-white" required>
+            <button class="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold">CREATE ADMIN</button>
+        </form>
+    </div>
+</body>
+</html>

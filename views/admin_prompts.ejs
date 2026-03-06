@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body { font-family: 'Plus Jakarta Sans', sans-serif; background-color:#05070a; color:#ffffff; }
+.premium-card { background:#0c0e12; border:1px solid rgba(255,255,255,0.05); }
+.premium-btn { background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%); box-shadow:0 4px 15px rgba(59,130,246,0.4); transition:0.3s; }
+.premium-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(59,130,246,0.6); }
+</style>
+
+<title>The AItel | Agent Prompts</title>
+</head>
+
+<body class="min-h-screen">
+
+<header class="p-6 flex justify-between items-center max-w-6xl mx-auto">
+
+<img src="/logo.png" alt="Logo" class="w-24 h-24 object-contain"
+onerror="this.src='https://via.placeholder.com/96?text=LOGO'">
+
+<a href="/admin/dashboard"
+class="premium-btn px-6 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase">
+← BACK TO DASHBOARD
+</a>
+
+</header>
+
+
+<main class="max-w-6xl mx-auto px-6 py-6">
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+<% if (prompts && prompts.length > 0) { %>
+
+<% prompts.forEach(function(prompt) { %>
+
+<div class="premium-card p-8 rounded-[2rem] group relative hover:border-blue-500/50 transition-all duration-300">
+
+<h3 class="text-xl font-bold tracking-tight mb-4 uppercase"><%= prompt.title %></h3>
+
+<div class="bg-black/40 p-5 rounded-xl font-mono text-xs text-gray-400 mb-4 max-h-48 overflow-y-auto whitespace-pre-wrap break-words">
+<%= prompt.content %>
+</div>
+
+<% if(prompt.last_edit_reason || prompt.last_edit_date || prompt.last_edit_by) { %>
+
+<div class="mt-4 pt-3 border-t border-white/5 flex flex-col items-start text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+
+<span>Audit:</span>
+
+<span>Reason:
+<span class="font-normal normal-case italic ml-2"><%= prompt.last_edit_reason %></span>
+</span>
+
+<span>Date:
+<%= prompt.last_edit_date ? new Date(prompt.last_edit_date).toLocaleString([], {dateStyle:'short',timeStyle:'short'}) : '' %>
+</span>
+
+<span>Editor:
+<%= prompt.last_edit_by ? prompt.last_edit_by : '' %>
+</span>
+
+</div>
+
+<% } %>
+
+
+<div class="flex gap-3 mt-4">
+
+<button
+class="premium-btn px-4 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase"
+type="button"
+onclick='openEditModal(<%= JSON.stringify(prompt.id) %>, <%= JSON.stringify(prompt.title) %>, <%= JSON.stringify(prompt.content) %>)'>
+Edit
+</button>
+
+
+<form action="/admin/delete-prompt" method="POST" onsubmit="return confirm('Delete this prompt?');">
+
+<input type="hidden" name="promptId" value="<%= prompt.id %>">
+<input type="hidden" name="agentId" value="<%= agentId %>">
+
+<button class="premium-btn px-4 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase bg-red-500">
+Delete
+</button>
+
+</form>
+
+
+<button
+type="button"
+onclick='showPromptModal(<%= JSON.stringify(prompt.title) %>, <%= JSON.stringify(prompt.content) %>)'
+class="premium-btn px-4 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase bg-gray-700">
+View
+</button>
+
+</div>
+
+</div>
+
+<% }) %>
+
+<% } else { %>
+
+<div class="premium-card p-8 rounded-[2rem] text-center text-gray-400 text-xs">
+No prompts found for this agent.
+</div>
+
+<% } %>
+
+</div>
+
+</main>
+
+
+<!-- VIEW MODAL -->
+
+<div id="promptModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
+
+<div class="premium-card p-8 rounded-[2rem] w-full max-w-2xl relative overflow-y-auto max-h-[90vh]">
+
+<button onclick="document.getElementById('promptModal').classList.add('hidden')" class="absolute top-4 right-4 text-white text-2xl">&times;</button>
+
+<h2 id="promptModalTitle" class="text-white text-lg font-bold mb-6 tracking-widest uppercase"></h2>
+
+<div id="promptModalContent" class="bg-black/40 p-5 rounded-xl font-mono text-xs text-gray-400 whitespace-pre-wrap"></div>
+
+</div>
+
+</div>
+
+
+<!-- EDIT MODAL -->
+
+<div id="editModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
+
+<div class="premium-card p-8 rounded-[2rem] w-full max-w-2xl relative">
+
+<button onclick="document.getElementById('editModal').classList.add('hidden')" class="absolute top-4 right-4 text-white text-2xl">&times;</button>
+
+<h2 class="text-white text-lg font-bold mb-6 tracking-widest uppercase">
+Edit Prompt
+</h2>
+
+<form action="/admin/edit-prompt" method="POST" class="space-y-4">
+
+<input type="hidden" name="promptId" id="editPromptId">
+<input type="hidden" name="agentId" value="<%= agentId %>">
+
+<input type="text" name="title" id="editPromptTitle"
+class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500 text-sm"
+required>
+
+<textarea name="content" id="editPromptContent"
+class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500 text-sm"
+style="min-height:300px"
+required></textarea>
+
+<input type="text" name="reason" id="editPromptReason"
+placeholder="Edit Reason"
+class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white outline-none focus:border-blue-500 text-sm"
+required>
+
+<button class="premium-btn w-full text-white py-3 rounded-xl font-bold text-xs tracking-widest uppercase">
+Save Edit
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+
+<script>
+
+function showPromptModal(title,content){
+
+document.getElementById('promptModalTitle').innerText=title
+document.getElementById('promptModalContent').innerText=content
+document.getElementById('promptModal').classList.remove('hidden')
+
+}
+
+function openEditModal(id,title,content){
+
+document.getElementById('editPromptId').value=id
+document.getElementById('editPromptTitle').value=title
+document.getElementById('editPromptContent').value=content
+document.getElementById('editPromptReason').value=''
+
+document.getElementById('editModal').classList.remove('hidden')
+
+}
+
+</script>
+
+</body>
+</html>

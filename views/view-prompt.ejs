@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>View Prompt</title>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+    <div class="bg-gray-800 rounded-xl p-8 w-full max-w-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-4">Agent: <%= agent.agent_name %></h2>
+        <% if (prompt) { %>
+            <h3 class="text-lg font-semibold mb-2">Prompt Title: <%= prompt.title %></h3>
+            <div class="mb-4">
+                <label class="block font-bold mb-2">Prompt Content:</label>
+                <div class="bg-gray-700 rounded p-4 whitespace-pre-wrap"><%= prompt.content %></div>
+            </div>
+            <div class="mb-4">
+                <label class="block font-bold mb-2">Last Edit Reason:</label>
+                <div class="bg-gray-700 rounded p-2"><%= prompt.last_edit_reason || 'N/A' %></div>
+            </div>
+            <div class="mb-4">
+                <label class="block font-bold mb-2">Last Edit Date:</label>
+                <div class="bg-gray-700 rounded p-2"><%= prompt.last_edit_date ? prompt.last_edit_date.toLocaleString() : 'N/A' %></div>
+            </div>
+        <% } else { %>
+            <div class="text-red-400">No prompt found for this agent.</div>
+        <% } %>
+        <a href="/admin" class="mt-6 inline-block premium-btn text-white px-6 py-2 rounded-lg font-bold">Back to Admin</a>
+    </div>
+</body>
+</html>
